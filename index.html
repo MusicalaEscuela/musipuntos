@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Musipuntos · Musicala</title>
+
+  <!-- Tipografía -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <meta name="theme-color" content="#0C0A1E">
+</head>
+<body>
+  <!-- Barra superior -->
+  <header class="topbar">
+    <div class="brand">
+      <img src="logo.png" alt="Logo Musicala" class="logo" />
+      <h1 class="app-title">Musipuntos</h1>
+    </div>
+
+    <nav class="group-controls" aria-label="Grupos">
+      <div class="group-select-wrap">
+        <select id="groupSelect" class="select" aria-label="Seleccionar grupo">
+          <option value="" disabled selected>— Selecciona grupo —</option>
+        </select>
+      </div>
+      <button id="btnNewGroup" class="btn primary">Nuevo grupo</button>
+      <button id="btnRenameGroup" class="btn">Renombrar</button>
+      <button id="btnDeleteGroup" class="btn danger">Eliminar</button>
+
+      <span id="localBadge" class="chip chip-local" title="Guardado en este dispositivo">Datos locales</span>
+
+      <button id="btnExport" class="btn">Exportar</button>
+      <label class="btn">
+        Importar
+        <input id="fileImport" type="file" accept="application/json" hidden />
+      </label>
+    </nav>
+  </header>
+
+  <!-- Cinta de métricas y acciones globales -->
+  <section class="ribbon">
+    <div class="stat">
+      <span class="stat-label">Total estudiantes:</span>
+      <span id="statStudents" class="stat-value">0</span>
+    </div>
+
+    <div class="stat">
+      <span class="stat-label">Puntos del grupo:</span>
+      <span id="statGroupPoints" class="stat-value">0</span>
+    </div>
+
+    <div class="actions-left">
+      <button id="btnAddStudent" class="btn success">Agregar estudiante</button>
+    </div>
+
+    <div class="actions-right">
+      <label class="sr-only" for="sortSelect">Ordenar</label>
+      <select id="sortSelect" class="select" aria-label="Ordenar estudiantes">
+        <option value="az">A—Z</option>
+        <option value="za">Z—A</option>
+        <option value="points-desc">Más puntos</option>
+        <option value="points-asc">Menos puntos</option>
+        <option value="recent">Más reciente</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- Contenido principal -->
+  <main class="layout">
+    <!-- Columna izquierda: tarjetas de estudiantes -->
+    <section class="students">
+      <div id="studentsGrid" class="grid-cards" aria-live="polite"></div>
+    </section>
+
+    <!-- Columna derecha: acciones rápidas, categorías e historial -->
+    <aside class="sidebar">
+      <section class="panel">
+        <h2 class="panel-title">Acción rápida</h2>
+
+        <label class="label" for="quickCategory">Selecciona categoría</label>
+        <select id="quickCategory" class="select"></select>
+
+        <button id="btnGroupPlusOne" class="btn success w-full" style="margin-top:.75rem">
+          +1 a todo el grupo
+        </button>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">Categorías</h2>
+
+        <div id="catsList" class="btn-row" aria-live="polite"></div>
+
+        <div class="btn-row" style="margin-top:.5rem">
+          <input id="catInput" class="input" type="text" placeholder="Nueva categoría" />
+          <button id="btnAddCat" class="btn">Agregar</button>
+          <button id="btnResetCats" class="btn ghost" title="Restablecer a predeterminadas">Restablecer</button>
+        </div>
+
+        <p class="hint">Los docentes pueden personalizar en qué se dan puntos. Estas categorías alimentan todos los selectores del grupo.</p>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">Historial del grupo</h2>
+        <ol id="groupHistory" class="history" aria-live="polite"></ol>
+      </section>
+    </aside>
+  </main>
+
+  <!-- Plantilla de tarjeta de estudiante -->
+  <template id="tplStudentCard">
+    <article class="card">
+      <div class="card-header">
+        <div class="avatar" title="Estudiante">
+          <img class="avatar-img" alt="" />
+          <span class="avatar-emoji" aria-hidden="true"></span>
+          <svg class="avatar-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3v10.55A4 4 0 1 1 10 17V7h8V3h-6z"></path>
+          </svg>
+        </div>
+        <div class="title-wrap">
+          <h3 class="student-name">Nombre</h3>
+          <p class="student-role">Estudiante</p>
+        </div>
+        <div class="score-badge" title="Puntos totales del estudiante">0</div>
+      </div>
+
+      <div class="card-body">
+        <label class="label">Categoría</label>
+        <select class="select select-category"></select>
+
+        <div class="btn-row">
+          <button class="btn success btn-plus">+1</button>
+          <button class="btn warning btn-minus">-1</button>
+          <button class="btn btn-reset">Reiniciar</button>
+          <button class="btn ghost btn-edit" title="Editar nombre y avatar">✎</button>
+          <button class="btn ghost btn-history" title="Historial del estudiante">📜</button>
+          <button class="btn ghost btn-remove" title="Eliminar estudiante">🗑</button>
+        </div>
+
+        <p class="last-action">Sin historial aún</p>
+      </div>
+    </article>
+  </template>
+
+  <!-- Diálogos (texto, edición y historial) -->
+  <dialog id="dlgPrompt" class="dialog">
+    <form method="dialog" class="dialog-content" id="dlgForm">
+      <h3 id="dlgTitle">Nuevo estudiante</h3>
+      <label class="label" for="dlgInput">Nombre</label>
+      <input id="dlgInput" class="input" type="text" placeholder="Escribe un nombre" required />
+      <div class="dialog-actions">
+        <button value="cancel" class="btn">Cancelar</button>
+        <button id="dlgOk" value="ok" class="btn primary">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlgEditStudent" class="dialog">
+    <form method="dialog" class="dialog-content" id="dlgEditForm">
+      <h3>Editar estudiante</h3>
+
+      <label class="label" for="editName">Nombre</label>
+      <input id="editName" class="input" type="text" required />
+
+      <div class="avatar-edit-wrap">
+        <div class="avatar preview" id="editPreview">
+          <img class="avatar-img" alt="" />
+          <span class="avatar-emoji" aria-hidden="true"></span>
+          <svg class="avatar-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3v10.55A4 4 0 1 1 10 17V7h8V3h-6z"></path>
+          </svg>
+        </div>
+
+        <div class="avatar-picker">
+          <p class="label" style="margin-top:.25rem">Elegir estilo</p>
+          <div class="avatar-grid" id="avatarGrid"></div>
+
+          <p class="label" style="margin-top:.75rem">Elegir emoji</p>
+          <div class="emoji-grid" id="emojiGrid"></div>
+          <div class="btn-row" style="margin-top:.4rem">
+            <input id="emojiInput" class="input" type="text" placeholder="Pega un emoji aquí" inputmode="text" />
+            <button id="btnSetEmoji" type="button" class="btn">Usar emoji</button>
+            <button id="btnClearEmoji" type="button" class="btn ghost">Quitar emoji</button>
+          </div>
+
+          <div class="btn-row" style="margin-top:.75rem">
+            <label class="btn">
+              Subir imagen
+              <input id="avatarUpload" type="file" accept="image/*" hidden />
+            </label>
+            <button id="btnClearAvatar" type="button" class="btn ghost">Quitar imagen</button>
+          </div>
+          <p class="hint">Prioridad: imagen > emoji > estilo. Tamaño recomendado: imagen cuadrada.</p>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button value="cancel" class="btn">Cancelar</button>
+        <button id="editOk" value="ok" class="btn primary">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlgStudentHistory" class="dialog">
+    <form method="dialog" class="dialog-content" id="dlgHistForm">
+      <h3 id="histTitle">Historial de …</h3>
+      <ol id="histList" class="history" style="max-height:320px;"></ol>
+      <div class="dialog-actions">
+        <button id="btnExportHistTxt" type="button" class="btn">Exportar TXT</button>
+        <button id="btnExportHistJson" type="button" class="btn">Exportar JSON</button>
+        <button id="btnClearHist" type="button" class="btn danger">Borrar</button>
+        <button value="cancel" class="btn">Cerrar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Scripts -->
+  <script src="app.js" defer></script>
+</body>
+</html>
