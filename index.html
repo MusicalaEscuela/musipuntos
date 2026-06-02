@@ -3,222 +3,395 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Musipuntos · Musicala</title>
+  <title>MusiPuntos · Musicala</title>
 
   <!-- Tipografía -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Estilos -->
   <link rel="stylesheet" href="styles.css" />
-
-  <meta name="theme-color" content="#0C0A1E">
+  <meta name="theme-color" content="#F4F1FB">
 </head>
 <body>
-  <!-- Barra superior -->
+
+  <!-- ====================== BARRA SUPERIOR ====================== -->
   <header class="topbar">
     <div class="brand">
       <img src="logo.png" alt="Logo Musicala" class="logo" />
-      <h1 class="app-title">Musipuntos</h1>
+      <div class="brand-text">
+        <h1 class="app-title">MusiPuntos</h1>
+        <span class="brand-sub">Escuela de Artes Musicala</span>
+      </div>
     </div>
 
-    <nav class="group-controls" aria-label="Grupos">
+    <div class="group-controls">
       <div class="group-select-wrap">
+        <span class="group-mascot" id="groupMascot" aria-hidden="true"></span>
         <select id="groupSelect" class="select" aria-label="Seleccionar grupo">
-          <option value="" disabled selected>— Selecciona grupo —</option>
+          <option value="" disabled selected>— Selecciona un grupo —</option>
         </select>
       </div>
-      <button id="btnNewGroup" class="btn primary">Nuevo grupo</button>
-      <button id="btnRenameGroup" class="btn">Renombrar</button>
-      <button id="btnDeleteGroup" class="btn danger">Eliminar</button>
-
-      <span id="localBadge" class="chip chip-local" title="Guardado en este dispositivo">Datos locales</span>
-
-      <button id="btnExport" class="btn">Exportar</button>
-      <label class="btn">
-        Importar
-        <input id="fileImport" type="file" accept="application/json" hidden />
-      </label>
-    </nav>
+      <button id="btnNewGroup" class="btn primary" title="Crear un nuevo grupo">＋ Grupo</button>
+      <button id="btnGroupMenu" class="btn ghost" title="Opciones del grupo" aria-haspopup="true">⚙️</button>
+      <span id="syncBadge" class="chip chip-local" title="Conectando con la escuela…">💾 Local</span>
+      <button id="btnClassMode" class="btn class" title="Proyectar en clase">🖥️ Modo clase</button>
+    </div>
   </header>
 
-  <!-- Cinta de métricas y acciones globales -->
-  <section class="ribbon">
-    <div class="stat">
-      <span class="stat-label">Total estudiantes:</span>
-      <span id="statStudents" class="stat-value">0</span>
-    </div>
+  <!-- ====================== NAVEGACIÓN ====================== -->
+  <nav class="tabbar" aria-label="Secciones">
+    <button class="tab active" data-view="clase">🏫 Clase</button>
+    <button class="tab" data-view="equipos">🛡️ Equipos</button>
+    <button class="tab" data-view="recompensas">🎁 Recompensas</button>
+    <button class="tab" data-view="reportes">📊 Reportes</button>
+    <div class="tabbar-spacer"></div>
+    <button id="btnExport" class="btn ghost small">⬇️ Exportar</button>
+    <label class="btn ghost small">⬆️ Importar
+      <input id="fileImport" type="file" accept="application/json" hidden />
+    </label>
+  </nav>
 
-    <div class="stat">
-      <span class="stat-label">Puntos del grupo:</span>
-      <span id="statGroupPoints" class="stat-value">0</span>
-    </div>
+  <main class="app-main">
 
-    <div class="actions-left">
-      <button id="btnAddStudent" class="btn success">Agregar estudiante</button>
-    </div>
+    <!-- ============================================================ -->
+    <!-- VISTA: CLASE                                                  -->
+    <!-- ============================================================ -->
+    <section class="view" id="view-clase">
 
-    <div class="actions-right">
-      <label class="sr-only" for="sortSelect">Ordenar</label>
-      <select id="sortSelect" class="select" aria-label="Ordenar estudiantes">
-        <option value="az">A—Z</option>
-        <option value="za">Z—A</option>
-        <option value="points-desc">Más puntos</option>
-        <option value="points-asc">Menos puntos</option>
-        <option value="recent">Más reciente</option>
-      </select>
-    </div>
-  </section>
-
-  <!-- Contenido principal -->
-  <main class="layout">
-    <!-- Columna izquierda: tarjetas de estudiantes -->
-    <section class="students">
-      <div id="studentsGrid" class="grid-cards" aria-live="polite"></div>
-    </section>
-
-    <!-- Columna derecha: acciones rápidas, categorías e historial -->
-    <aside class="sidebar">
-      <section class="panel">
-        <h2 class="panel-title">Acción rápida</h2>
-
-        <label class="label" for="quickCategory">Selecciona categoría</label>
-        <select id="quickCategory" class="select"></select>
-
-        <button id="btnGroupPlusOne" class="btn success w-full" style="margin-top:.75rem">
-          +1 a todo el grupo
-        </button>
-      </section>
-
-      <section class="panel">
-        <h2 class="panel-title">Categorías</h2>
-
-        <div id="catsList" class="btn-row" aria-live="polite"></div>
-
-        <div class="btn-row" style="margin-top:.5rem">
-          <input id="catInput" class="input" type="text" placeholder="Nueva categoría" />
-          <button id="btnAddCat" class="btn">Agregar</button>
-          <button id="btnResetCats" class="btn ghost" title="Restablecer a predeterminadas">Restablecer</button>
+      <!-- Estado vacío global -->
+      <div id="emptyState" class="empty-state" hidden>
+        <div class="empty-monster" id="emptyMonster"></div>
+        <h2>¡Bienvenido a MusiPuntos!</h2>
+        <p>Crea tu primer grupo de estudiantes o carga un grupo de ejemplo para explorar la app.</p>
+        <div class="empty-actions">
+          <button id="btnEmptyNewGroup" class="btn primary big">＋ Crear grupo</button>
+          <button id="btnLoadDemo" class="btn success big">✨ Cargar demo</button>
         </div>
-
-        <p class="hint">Los docentes pueden personalizar en qué se dan puntos. Estas categorías alimentan todos los selectores del grupo.</p>
-      </section>
-
-      <section class="panel">
-        <h2 class="panel-title">Historial del grupo</h2>
-        <ol id="groupHistory" class="history" aria-live="polite"></ol>
-      </section>
-    </aside>
-  </main>
-
-  <!-- Plantilla de tarjeta de estudiante -->
-  <template id="tplStudentCard">
-    <article class="card">
-      <div class="card-header">
-        <div class="avatar" title="Estudiante">
-          <img class="avatar-img" alt="" />
-          <span class="avatar-emoji" aria-hidden="true"></span>
-          <svg class="avatar-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 3v10.55A4 4 0 1 1 10 17V7h8V3h-6z"></path>
-          </svg>
-        </div>
-        <div class="title-wrap">
-          <h3 class="student-name">Nombre</h3>
-          <p class="student-role">Estudiante</p>
-        </div>
-        <div class="score-badge" title="Puntos totales del estudiante">0</div>
       </div>
 
-      <div class="card-body">
-        <label class="label">Categoría</label>
-        <select class="select select-category"></select>
+      <!-- Contenido del grupo -->
+      <div id="groupContent" hidden>
 
-        <div class="btn-row">
-          <button class="btn success btn-plus">+1</button>
-          <button class="btn warning btn-minus">-1</button>
-          <button class="btn btn-reset">Reiniciar</button>
-          <button class="btn ghost btn-edit" title="Editar nombre y avatar">✎</button>
-          <button class="btn ghost btn-history" title="Historial del estudiante">📜</button>
-          <button class="btn ghost btn-remove" title="Eliminar estudiante">🗑</button>
+        <!-- Dashboard -->
+        <div class="dashboard" id="dashboard"></div>
+
+        <!-- Meta grupal -->
+        <div class="goal-card" id="goalCard"></div>
+
+        <!-- Barra de acciones -->
+        <div class="toolbar">
+          <button id="btnAddStudent" class="btn success">＋ Estudiante</button>
+          <button id="btnGroupPoints" class="btn primary">🌟 Puntos al grupo</button>
+          <button id="btnSelectMode" class="btn ghost" aria-pressed="false">☑️ Seleccionar</button>
+          <button id="btnGivePointsSelected" class="btn primary" hidden>＋ Dar a seleccionados</button>
+          <button id="btnRandom" class="btn ghost" title="Elegir estudiante al azar">🎲 Al azar</button>
+          <button id="btnUndo" class="btn ghost" title="Deshacer última acción" disabled>↩️ Deshacer</button>
+          <div class="toolbar-spacer"></div>
+          <label class="sr-only" for="sortSelect">Ordenar</label>
+          <select id="sortSelect" class="select small">
+            <option value="az">A—Z</option>
+            <option value="za">Z—A</option>
+            <option value="points-desc">Más puntos</option>
+            <option value="points-asc">Menos puntos</option>
+            <option value="recent">Más reciente</option>
+          </select>
         </div>
 
-        <p class="last-action">Sin historial aún</p>
+        <!-- Tarjetas -->
+        <div id="studentsGrid" class="grid-cards" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- VISTA: EQUIPOS                                                -->
+    <!-- ============================================================ -->
+    <section class="view" id="view-equipos" hidden>
+      <div class="section-head">
+        <h2>🛡️ Equipos del grupo</h2>
+        <button id="btnNewTeam" class="btn primary">＋ Nuevo equipo</button>
+      </div>
+      <div id="teamsGrid" class="grid-cards"></div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- VISTA: RECOMPENSAS                                            -->
+    <!-- ============================================================ -->
+    <section class="view" id="view-recompensas" hidden>
+      <div class="section-head">
+        <h2>🎁 Recompensas</h2>
+        <button id="btnNewReward" class="btn primary">＋ Nueva recompensa</button>
+      </div>
+      <div id="rewardsGrid" class="grid-cards"></div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- VISTA: REPORTES                                              -->
+    <!-- ============================================================ -->
+    <section class="view" id="view-reportes" hidden>
+      <div class="section-head">
+        <h2>📊 Reportes</h2>
+        <div class="report-export">
+          <button id="btnReportCsv" class="btn ghost small">⬇️ CSV</button>
+          <button id="btnReportJson" class="btn ghost small">⬇️ JSON</button>
+        </div>
+      </div>
+      <div class="report-filters" id="reportFilters"></div>
+      <div class="report-body" id="reportBody"></div>
+    </section>
+
+  </main>
+
+  <!-- ====================== TOASTS ====================== -->
+  <div id="toastHost" class="toast-host" aria-live="polite"></div>
+
+  <!-- ====================== CONFETI ====================== -->
+  <div id="confettiHost" class="confetti-host" aria-hidden="true"></div>
+
+  <!-- ====================== PLANTILLAS ====================== -->
+  <template id="tplStudentCard">
+    <article class="card student-card">
+      <div class="select-tick" hidden>✓</div>
+      <div class="card-top">
+        <div class="monster-holder"></div>
+        <button class="net-badge" title="Puntaje neto">0</button>
+      </div>
+      <h3 class="student-name">Nombre</h3>
+      <p class="student-team"></p>
+      <div class="mini-stats">
+        <span class="mini pos">＋<b class="pos-val">0</b></span>
+        <span class="mini neg">－<b class="neg-val">0</b></span>
+      </div>
+      <div class="badges-row"></div>
+      <p class="last-action">Sin actividad aún</p>
+      <div class="card-actions">
+        <button class="btn success btn-plus">＋ Puntos</button>
+        <button class="btn warn btn-minus">A mejorar</button>
+      </div>
+      <div class="card-actions secondary">
+        <button class="btn ghost tiny btn-profile" title="Perfil">👤 Perfil</button>
+        <button class="btn ghost tiny btn-edit" title="Editar monstruo">🎨 Avatar</button>
+        <button class="btn ghost tiny btn-remove" title="Eliminar">🗑️</button>
       </div>
     </article>
   </template>
 
-  <!-- Diálogos (texto, edición y historial) -->
+  <!-- ====================== MODALES ====================== -->
+
+  <!-- Prompt de texto reutilizable -->
   <dialog id="dlgPrompt" class="dialog">
-    <form method="dialog" class="dialog-content" id="dlgForm">
-      <h3 id="dlgTitle">Nuevo estudiante</h3>
-      <label class="label" for="dlgInput">Nombre</label>
-      <input id="dlgInput" class="input" type="text" placeholder="Escribe un nombre" required />
+    <form method="dialog" class="dialog-content">
+      <h3 id="dlgTitle">Título</h3>
+      <label class="label" for="dlgInput" id="dlgLabel">Nombre</label>
+      <input id="dlgInput" class="input" type="text" required />
       <div class="dialog-actions">
-        <button value="cancel" class="btn">Cancelar</button>
+        <button value="cancel" class="btn ghost">Cancelar</button>
         <button id="dlgOk" value="ok" class="btn primary">Guardar</button>
       </div>
     </form>
   </dialog>
 
-  <dialog id="dlgEditStudent" class="dialog">
-    <form method="dialog" class="dialog-content" id="dlgEditForm">
-      <h3>Editar estudiante</h3>
+  <!-- Menú de grupo -->
+  <dialog id="dlgGroupMenu" class="dialog">
+    <div class="dialog-content">
+      <h3>Opciones del grupo</h3>
+      <div class="menu-list">
+        <button class="menu-item" data-act="rename">✏️ Renombrar grupo</button>
+        <button class="menu-item" data-act="mascot">👾 Cambiar monstruo mascota</button>
+        <button class="menu-item" data-act="goal">🎯 Configurar meta grupal</button>
+        <button class="menu-item" data-act="cats">🏷️ Editar categorías</button>
+        <button class="menu-item danger" data-act="delete">🗑️ Eliminar grupo</button>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn ghost" data-close>Cerrar</button>
+      </div>
+    </div>
+  </dialog>
 
+  <!-- Asignar puntos -->
+  <dialog id="dlgPoints" class="dialog wide">
+    <div class="dialog-content">
+      <h3 id="pointsTitle">Asignar puntos</h3>
+      <p class="dialog-sub" id="pointsTarget"></p>
+
+      <div class="seg-tabs" id="pointsTabs">
+        <button class="seg active" data-kind="positivo">😊 Positivos</button>
+        <button class="seg" data-kind="mejora">🌱 A mejorar</button>
+        <button class="seg" data-kind="observacion">👀 Observación</button>
+        <button class="seg" data-kind="manual">✍️ Manual</button>
+      </div>
+
+      <div class="cat-grid" id="pointsCatGrid"></div>
+
+      <div class="manual-row" id="manualRow" hidden>
+        <label class="label" for="manualPoints">Puntos</label>
+        <input id="manualPoints" class="input" type="number" value="1" />
+      </div>
+
+      <label class="label" for="pointsNote">Nota (opcional)</label>
+      <input id="pointsNote" class="input" type="text" placeholder="Una observación para el historial…" />
+
+      <div class="points-preview" id="pointsPreview">Selecciona una categoría</div>
+
+      <div class="dialog-actions">
+        <button class="btn ghost" data-close>Cancelar</button>
+        <button id="pointsConfirm" class="btn primary" disabled>Confirmar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Editor de estudiante (monstruo) -->
+  <dialog id="dlgEditStudent" class="dialog wide">
+    <div class="dialog-content">
+      <h3>Editar estudiante</h3>
       <label class="label" for="editName">Nombre</label>
       <input id="editName" class="input" type="text" required />
 
-      <div class="avatar-edit-wrap">
-        <div class="avatar preview" id="editPreview">
-          <img class="avatar-img" alt="" />
-          <span class="avatar-emoji" aria-hidden="true"></span>
-          <svg class="avatar-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 3v10.55A4 4 0 1 1 10 17V7h8V3h-6z"></path>
-          </svg>
+      <div class="edit-grid">
+        <div class="edit-preview">
+          <div class="monster-holder big" id="editMonsterHolder"></div>
+          <label class="label" for="editTeam">Equipo</label>
+          <select id="editTeam" class="select"></select>
         </div>
-
-        <div class="avatar-picker">
-          <p class="label" style="margin-top:.25rem">Elegir estilo</p>
-          <div class="avatar-grid" id="avatarGrid"></div>
-
-          <p class="label" style="margin-top:.75rem">Elegir emoji</p>
-          <div class="emoji-grid" id="emojiGrid"></div>
-          <div class="btn-row" style="margin-top:.4rem">
-            <input id="emojiInput" class="input" type="text" placeholder="Pega un emoji aquí" inputmode="text" />
-            <button id="btnSetEmoji" type="button" class="btn">Usar emoji</button>
-            <button id="btnClearEmoji" type="button" class="btn ghost">Quitar emoji</button>
-          </div>
-
-          <div class="btn-row" style="margin-top:.75rem">
-            <label class="btn">
-              Subir imagen
-              <input id="avatarUpload" type="file" accept="image/*" hidden />
-            </label>
-            <button id="btnClearAvatar" type="button" class="btn ghost">Quitar imagen</button>
-          </div>
-          <p class="hint">Prioridad: imagen > emoji > estilo. Tamaño recomendado: imagen cuadrada.</p>
+        <div class="edit-pickers">
+          <p class="label">Elige tu monstruo</p>
+          <div class="monster-gallery" id="monsterGallery"></div>
+          <p class="label" style="margin-top:.6rem">Elige un color</p>
+          <div class="color-row" id="colorRow"></div>
         </div>
       </div>
 
       <div class="dialog-actions">
-        <button value="cancel" class="btn">Cancelar</button>
-        <button id="editOk" value="ok" class="btn primary">Guardar</button>
+        <button class="btn ghost" data-close>Cancelar</button>
+        <button id="editOk" class="btn primary">Guardar</button>
       </div>
-    </form>
+    </div>
   </dialog>
 
-  <dialog id="dlgStudentHistory" class="dialog">
-    <form method="dialog" class="dialog-content" id="dlgHistForm">
-      <h3 id="histTitle">Historial de …</h3>
-      <ol id="histList" class="history" style="max-height:320px;"></ol>
+  <!-- Perfil del estudiante -->
+  <dialog id="dlgProfile" class="dialog wide">
+    <div class="dialog-content" id="profileContent"></div>
+  </dialog>
+
+  <!-- Editor de equipo -->
+  <dialog id="dlgTeam" class="dialog wide">
+    <div class="dialog-content">
+      <h3 id="teamDlgTitle">Equipo</h3>
+      <label class="label" for="teamName">Nombre del equipo</label>
+      <input id="teamName" class="input" type="text" required />
+      <label class="label">Color</label>
+      <div class="color-row" id="teamColorRow"></div>
+      <label class="label">Monstruo del equipo</label>
+      <div class="monster-gallery small" id="teamMonsterGallery"></div>
+      <label class="label">Integrantes</label>
+      <div class="member-list" id="teamMemberList"></div>
       <div class="dialog-actions">
-        <button id="btnExportHistTxt" type="button" class="btn">Exportar TXT</button>
-        <button id="btnExportHistJson" type="button" class="btn">Exportar JSON</button>
-        <button id="btnClearHist" type="button" class="btn danger">Borrar</button>
-        <button value="cancel" class="btn">Cerrar</button>
+        <button class="btn ghost" data-close>Cancelar</button>
+        <button id="teamOk" class="btn primary">Guardar</button>
       </div>
-    </form>
+    </div>
   </dialog>
 
-  <!-- Scripts -->
+  <!-- Editor de recompensa -->
+  <dialog id="dlgReward" class="dialog">
+    <div class="dialog-content">
+      <h3 id="rewardDlgTitle">Recompensa</h3>
+      <label class="label" for="rewardName">Nombre</label>
+      <input id="rewardName" class="input" type="text" required />
+      <label class="label" for="rewardDesc">Descripción</label>
+      <input id="rewardDesc" class="input" type="text" />
+      <div class="row-2">
+        <div>
+          <label class="label" for="rewardCost">Costo (puntos)</label>
+          <input id="rewardCost" class="input" type="number" value="10" min="0" />
+        </div>
+        <div>
+          <label class="label" for="rewardIcon">Icono</label>
+          <input id="rewardIcon" class="input" type="text" value="🎁" />
+        </div>
+      </div>
+      <div class="row-2">
+        <div>
+          <label class="label" for="rewardType">Tipo</label>
+          <select id="rewardType" class="select">
+            <option value="individual">Individual</option>
+            <option value="equipo">Equipo</option>
+            <option value="grupal">Grupal</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="rewardActive">Estado</label>
+          <select id="rewardActive" class="select">
+            <option value="true">Activa</option>
+            <option value="false">Inactiva</option>
+          </select>
+        </div>
+      </div>
+      <label class="check"><input id="rewardDeduct" type="checkbox" checked /> El canje descuenta puntos</label>
+      <div class="dialog-actions">
+        <button class="btn ghost" data-close>Cancelar</button>
+        <button id="rewardOk" class="btn primary">Guardar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Canjear recompensa -->
+  <dialog id="dlgRedeem" class="dialog">
+    <div class="dialog-content">
+      <h3 id="redeemTitle">Canjear recompensa</h3>
+      <p class="dialog-sub" id="redeemSub"></p>
+      <label class="label" for="redeemTarget">¿Para quién?</label>
+      <select id="redeemTarget" class="select"></select>
+      <div class="dialog-actions">
+        <button class="btn ghost" data-close>Cancelar</button>
+        <button id="redeemOk" class="btn primary">Canjear</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Editor de categorías -->
+  <dialog id="dlgCats" class="dialog wide">
+    <div class="dialog-content">
+      <h3>Categorías de puntos</h3>
+      <div class="cat-editor" id="catEditor"></div>
+      <div class="cat-add-row">
+        <input id="catNewName" class="input" placeholder="Nueva categoría" />
+        <input id="catNewIcon" class="input tiny-input" value="⭐" />
+        <input id="catNewPts" class="input tiny-input" type="number" value="1" />
+        <select id="catNewType" class="select small">
+          <option value="positivo">Positivo</option>
+          <option value="mejora">A mejorar</option>
+          <option value="observacion">Observación</option>
+        </select>
+        <button id="btnAddCat" class="btn primary">Agregar</button>
+      </div>
+      <div class="dialog-actions">
+        <button id="btnResetCats" class="btn ghost">Restablecer</button>
+        <button class="btn primary" data-close>Listo</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Meta grupal -->
+  <dialog id="dlgGoal" class="dialog">
+    <div class="dialog-content">
+      <h3>Meta grupal</h3>
+      <label class="label" for="goalTarget">Puntos objetivo</label>
+      <input id="goalTarget" class="input" type="number" value="50" min="1" />
+      <label class="label" for="goalReward">Recompensa al lograrla</label>
+      <input id="goalReward" class="input" type="text" placeholder="Ej: Clase temática especial" />
+      <div class="dialog-actions">
+        <button id="goalClear" class="btn ghost">Quitar meta</button>
+        <button id="goalOk" class="btn primary">Guardar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ====================== MODO CLASE ====================== -->
+  <div id="classMode" class="class-mode" hidden></div>
+
+  <!-- Sincronización en la nube (debe ir antes de app.js) -->
+  <script type="module" src="firebase-sync.js"></script>
   <script src="app.js" defer></script>
 </body>
 </html>
