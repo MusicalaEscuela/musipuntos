@@ -847,7 +847,9 @@ function abrirPerfil(id){
 }
 
 /* Toast / confeti */
+function buzz(ms=15){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
 function toast(msg, ico="✅", tipo="", conUndo=false){
+  buzz(tipo==="neg"?[10,40,10]:15);
   const host=$("#toastHost"); const t=document.createElement("div"); t.className="toast "+tipo;
   t.innerHTML=`<span>${ico}</span><span>${escapeHtml(msg)}</span>`;
   if(conUndo){ const b=document.createElement("button"); b.textContent="Deshacer"; b.onclick=()=>{ deshacer(); t.remove(); }; t.appendChild(b); }
@@ -991,6 +993,9 @@ function handleGroupMenu(act){
   else if(act==="goal"){ $("#goalTarget").value=g.meta?.objetivo||50; $("#goalReward").value=g.meta?.recompensa||""; $("#dlgGoal").showModal(); }
   else if(act==="cats"){ renderCatEditor(); $("#dlgCats").showModal(); }
   else if(act==="mascot"){ cambiarMascota(); }
+  else if(act==="classmode"){ abrirModoClase(); }
+  else if(act==="export"){ exportarDatos(); }
+  else if(act==="import"){ $("#fileImport").click(); }
 }
 function cambiarMascota(){
   // reusar editor simple: ciclar tipo/color mediante el editor de equipo-like inline

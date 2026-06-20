@@ -41,13 +41,13 @@
 
   <!-- ====================== NAVEGACIÓN ====================== -->
   <nav class="tabbar" aria-label="Secciones">
-    <button class="tab active" data-view="clase">🏫 Clase</button>
-    <button class="tab" data-view="equipos">🛡️ Equipos</button>
-    <button class="tab" data-view="recompensas">🎁 Recompensas</button>
-    <button class="tab" data-view="reportes">📊 Reportes</button>
+    <button class="tab active" data-view="clase"><span class="tab-ico">🏫</span><span class="tab-lab">Clase</span></button>
+    <button class="tab" data-view="equipos"><span class="tab-ico">🛡️</span><span class="tab-lab">Equipos</span></button>
+    <button class="tab" data-view="recompensas"><span class="tab-ico">🎁</span><span class="tab-lab">Recompensas</span></button>
+    <button class="tab" data-view="reportes"><span class="tab-ico">📊</span><span class="tab-lab">Reportes</span></button>
     <div class="tabbar-spacer"></div>
-    <button id="btnExport" class="btn ghost small">⬇️ Exportar</button>
-    <label class="btn ghost small">⬆️ Importar
+    <button id="btnExport" class="btn ghost small tabbar-only">⬇️ Exportar</button>
+    <label class="btn ghost small tabbar-only">⬆️ Importar
       <input id="fileImport" type="file" accept="application/json" hidden />
     </label>
   </nav>
@@ -200,6 +200,10 @@
         <button class="menu-item" data-act="mascot">👾 Cambiar monstruo mascota</button>
         <button class="menu-item" data-act="goal">🎯 Configurar meta grupal</button>
         <button class="menu-item" data-act="cats">🏷️ Editar categorías</button>
+        <div class="menu-sep menu-mobile-only"></div>
+        <button class="menu-item menu-mobile-only" data-act="classmode">🖥️ Modo clase</button>
+        <button class="menu-item menu-mobile-only" data-act="export">⬇️ Exportar datos</button>
+        <button class="menu-item menu-mobile-only" data-act="import">⬆️ Importar datos</button>
         <button class="menu-item danger" data-act="delete">🗑️ Eliminar grupo</button>
       </div>
       <div class="dialog-actions">

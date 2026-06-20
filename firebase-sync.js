@@ -35,6 +35,8 @@ function setBadge(texto, titulo, color){
   b.textContent = texto;
   if(titulo) b.title = titulo;
   if(color) b.style.borderColor = color;
+  // estado para el indicador compacto en móvil (puntito de color)
+  b.classList.toggle("is-synced", color === "#16b673");
 }
 
 /* API expuesta a app.js */
