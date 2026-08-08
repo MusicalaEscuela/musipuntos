@@ -2,7 +2,11 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="apple-touch-icon" href="logo.png" />
   <title>MusiPuntos · Musicala</title>
 
   <!-- Tipografía -->
@@ -10,7 +14,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css" />
+  <!-- ?v= evita que los celulares se queden con una versión vieja en caché.
+       Sube el número cada vez que cambies styles.css / app.js. -->
+  <link rel="stylesheet" href="styles.css?v=6" />
   <meta name="theme-color" content="#F4F1FB">
 </head>
 <body>
@@ -169,9 +175,9 @@
         <button class="btn warn btn-minus">A mejorar</button>
       </div>
       <div class="card-actions secondary">
-        <button class="btn ghost tiny btn-profile" title="Perfil">👤 Perfil</button>
-        <button class="btn ghost tiny btn-edit" title="Editar monstruo">🎨 Avatar</button>
-        <button class="btn ghost tiny btn-remove" title="Eliminar">🗑️</button>
+        <button class="btn ghost tiny btn-profile" title="Perfil" aria-label="Perfil">👤<span class="btn-lab">Perfil</span></button>
+        <button class="btn ghost tiny btn-edit" title="Editar monstruo" aria-label="Editar monstruo">🎨<span class="btn-lab">Avatar</span></button>
+        <button class="btn ghost tiny btn-remove" title="Eliminar" aria-label="Eliminar">🗑️</button>
       </div>
     </article>
   </template>
@@ -395,7 +401,7 @@
   <div id="classMode" class="class-mode" hidden></div>
 
   <!-- Sincronización en la nube (debe ir antes de app.js) -->
-  <script type="module" src="firebase-sync.js"></script>
-  <script src="app.js" defer></script>
+  <script type="module" src="firebase-sync.js?v=6"></script>
+  <script src="app.js?v=6" defer></script>
 </body>
 </html>

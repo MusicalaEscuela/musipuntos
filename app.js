@@ -263,7 +263,7 @@ function updateGroupMascot(){
   else el.innerHTML="";
 }
 
-function estudiantes(){ return Object.values(grupo().estudiantes||{}); }
+function estudiantes(){ const g=grupo(); return g? Object.values(g.estudiantes||{}) : []; }
 function neto(s){ return (s.puntosPos||0) - (s.puntosNeg||0); }
 
 function renderDashboard(){
@@ -312,6 +312,7 @@ function renderGoal(){
 
 function renderStudents(){
   const grid=$("#studentsGrid"); grid.innerHTML="";
+  if(!grupoActual || !grupo()) return;
   let ests=estudiantes();
   if(!ests.length){ grid.innerHTML=`<p class="hint" style="grid-column:1/-1;text-align:center;padding:2rem">Aún no hay estudiantes. ¡Agrega el primero! 🎶</p>`; return; }
   const g=grupo();
