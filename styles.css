@@ -553,6 +553,17 @@ button{font-family:inherit}
   .toast-host{bottom:calc(4.9rem + env(safe-area-inset-bottom));width:100%;padding:0 .9rem}
   .toast{width:100%;justify-content:center;border-radius:16px}
 }
+/* En teléfonos angostos el nombre de la app dejaba al selector del grupo con
+   menos de 80 px (y en 320 px prácticamente sin espacio). El logo conserva la
+   identidad mientras priorizamos el control que el profesor necesita usar. */
+@media (max-width:480px){
+  .brand-text{display:none}
+  .brand{flex:0 0 auto}
+  .group-controls{min-width:0}
+  .group-select-wrap{min-width:0}
+  .group-select-wrap .select{min-width:0}
+}
+
 @keyframes sheetUp{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
 
 /* móviles muy angostos: tarjetas a 1 columna */
@@ -560,6 +571,14 @@ button{font-family:inherit}
   .grid-cards{grid-template-columns:1fr}
   .card-actions{flex-direction:row}
   .stat-card{flex-basis:56%}
+  /* En pantallas de 320 px el estado inicial quedaba detrás de la barra fija.
+     Compactamos sólo esta bienvenida para que sus dos acciones sigan visibles. */
+  .empty-state{margin:.75rem auto;padding:1rem .4rem calc(5.2rem + env(safe-area-inset-bottom))}
+  .empty-monster{width:100px;height:100px;margin-bottom:.55rem}
+  .empty-state h2{font-size:1.5rem;line-height:1.25}
+  .empty-state p{margin-bottom:.85rem;font-size:.9rem}
+  .empty-actions{flex-wrap:nowrap;gap:.45rem}
+  .empty-actions .btn.big{padding:.7rem .7rem;font-size:16px;white-space:nowrap}
 }
 
 /* ---------- Interacción táctil ---------- */
